@@ -34,6 +34,15 @@ h1 small{color:var(--mut);font-weight:400;font-size:13px;margin-left:6px}
 .chk.on label{color:var(--mut);text-decoration:line-through}
 .chk label{flex:1}
 ol.steps{margin:0;padding-left:20px;font-size:14px}ol.steps li{margin-bottom:8px}
+input.txt{text-align:left;font-weight:600}
+.edrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.edrow label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.edrow input{margin-top:3px}
+.edbtn{display:flex;gap:6px;margin-top:8px}
+.edbtn button{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font:600 14px inherit}
+.edbtn button:disabled{opacity:.35}
+.edbtn .del{color:var(--bad);flex:2}
+button.add{width:100%;padding:12px;border-radius:12px;border:1px dashed var(--acc);background:none;color:var(--acc);font:600 14px inherit;margin-bottom:10px}
 h2.sec{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px}
 main{padding:12px 16px}
 .focus{color:var(--mut);margin:2px 0 12px;font-size:13px}
@@ -73,7 +82,7 @@ summary{font-weight:600}
 <div class="toast" id="toast"></div>
 
 <script>
-const PLAN = {
+const DEFAULT_PLAN = {
   lun:{n:"Lun",f:"Push + Core A",ex:[
     ["panca","Panca piana bilanciere",4,"5–7","2'30\""],["dip","Dip zavorrati",4,"6–8","2'"],
     ["military","Military press in piedi",3,"6–8","2'"],["hspu","Pike push-up / HSPU al muro",3,"6–10","90\""],
@@ -82,23 +91,23 @@ const PLAN = {
     ["hlr","Core A · Hanging leg raise",4,"8–12","60\""],["crunch","Core A · Crunch ai cavi",3,"10–15","60\""],["wheel","Core A · Ab wheel",3,"8–12","60\""]]},
   mar:{n:"Mar",f:"Pull + Core B",ex:[
     ["trazioni","Trazioni zavorrate prona",4,"5–7","2'30\""],["rematore","Rematore bilanciere",4,"6–8","2'"],
-    ["fl","Front lever (tuck → adv.) · secondi",5,"8–12\"","90\""],["lat","Lat machine presa stretta",3,"8–12","90\""],
+    ["tuckfl","Tuck front lever (o scapular pull) · sec",4,"5–10\"","90\""],["lat","Lat machine presa stretta",3,"8–12","90\""],
     ["rem_cavo","Rematore cavo 1 braccio",3,"10–12","60\""],["facepull","Face pull",3,"15","60\""],
     ["curl","Curl bilanciere",3,"8–12","60\""],["hammer","Curl a martello",3,"8–12","60\""],
-    ["lsit","Core B · L-sit · secondi",5,"10–20\"","45\""],["pallof","Core B · Pallof / woodchopper",3,"12/lato","45\""],
-    ["dragon","Core B · Dragon flag negativi",3,"4–6","90\""],["plank","Core B · Side/copenhagen plank · sec",2,"30\"/lato","30\""]]},
+    ["tucklsit","Core B · Tuck L-sit · secondi",4,"10–15\"","45\""],["pallof","Core B · Pallof / woodchopper",3,"12/lato","45\""],
+    ["hollow","Core B · Hollow body hold · sec",3,"20–30\"","45\""],["plank","Core B · Side plank · sec",2,"30\"/lato","30\""]]},
   mer:{n:"Mer",f:"Gambe pesante + Core A",ex:[
     ["squat","Back squat",4,"5–7","3'"],["rdl","Stacco rumeno",3,"6–8","2'30\""],
     ["bulgari","Affondi bulgari manubri",3,"8–10/gamba","90\""],["legcurl","Leg curl",3,"10–12","60\""],
     ["calf","Calf raise in piedi",4,"10–15","60\""],
     ["hlr","Core A · Hanging leg raise",4,"8–12","60\""],["crunch","Core A · Crunch ai cavi",3,"10–15","60\""],["wheel","Core A · Ab wheel",3,"8–12","60\""]]},
-  ven:{n:"Ven",f:"Skill + volume + Core B",ex:[
-    ["hs","Handstand · secondi migliori",3,"20–45\"","—"],["mu","Muscle-up / progressione",5,"3–5","2'"],
-    ["planche","Planche lean / tuck · secondi",5,"10–15\"","90\""],["chin","Chin-up (SS)",3,"max−2","—"],
-    ["archer","Push-up arcieri (SS)",3,"8/lato","90\""],["ringrow","Ring row (SS)",3,"10–12","—"],
-    ["ringdip","Dip agli anelli (SS)",3,"8–10","90\""],["laterali_m","Alzate laterali manubri",3,"15–20","60\""],
-    ["lsit","Core B · L-sit · secondi",5,"10–20\"","45\""],["pallof","Core B · Pallof / woodchopper",3,"12/lato","45\""],
-    ["dragon","Core B · Dragon flag negativi",3,"4–6","90\""],["plank","Core B · Side/copenhagen plank · sec",2,"30\"/lato","30\""]]},
+  ven:{n:"Ven",f:"Calisthenics base + volume + Core B",ex:[
+    ["pikehold","Pike hold sul box · secondi",4,"20–30\"","60\""],["esplosive","Trazioni esplosive al petto",5,"3–5","2'"],
+    ["lean","Planche lean · secondi",4,"15–20\"","60\""],["chin","Chin-up (SS)",3,"max−2","—"],
+    ["pushup_r","Push-up piedi rialzati (SS)",3,"10–15","90\""],["ringrow","Ring row / TRX row (SS)",3,"10–12","—"],
+    ["dip_par","Dip alle parallele (SS)",3,"8–10","90\""],["laterali_m","Alzate laterali manubri",3,"15–20","60\""],
+    ["tucklsit","Core B · Tuck L-sit · secondi",4,"10–15\"","45\""],["pallof","Core B · Pallof / woodchopper",3,"12/lato","45\""],
+    ["hollow","Core B · Hollow body hold · sec",3,"20–30\"","45\""],["plank","Core B · Side plank · sec",2,"30\"/lato","30\""]]},
   sab:{n:"Sab",f:"Posteriore + condizionamento + Core A",ex:[
     ["stacco","Stacco da terra",4,"4–6","3'"],["hipthrust","Hip thrust bilanciere",3,"8–10","2'"],
     ["legpress","Leg press / front squat",3,"10–12","90\""],["nordic","Nordic curl assistito",3,"5–8","90\""],
@@ -109,7 +118,10 @@ const MAIN_LIFTS = ["panca","dip","trazioni","squat","stacco","rematore","milita
 const KEY="scheda.v1";
 const store=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.sessions?s:{sessions:[],drafts:{}}}catch(e){return{sessions:[],drafts:{}}}})();
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){toast("Errore salvataggio")}};
-const dayKeys=Object.keys(PLAN);
+const clone=o=>JSON.parse(JSON.stringify(o));
+if(!store.plan)store.plan=clone(DEFAULT_PLAN);
+const PLAN=store.plan;
+const dayKeys=Object.keys(DEFAULT_PLAN);
 const todayKey=()=>({1:"lun",2:"mar",3:"mer",5:"ven",6:"sab"})[new Date().getDay()]||"lun";
 let view={tab:todayKey()};
 const $=s=>document.querySelector(s);
@@ -123,16 +135,45 @@ function renderTabs(){
   const b=([k,n])=>`<button class="${view.tab===k?"on":""}" data-t="${k}">${n}</button>`;
   $("#tabs").innerHTML=dayKeys.map(k=>[k,PLAN[k].n]).map(b).join("");
   $("#tabs2").innerHTML=[["cibo","Alimentazione"],["storico","Storico"],["grafici","Grafici"]].map(b).join("");
-  $("#tabs").onclick=$("#tabs2").onclick=e=>{const t=e.target.dataset.t;if(t){view.tab=t;render()}};
+  $("#tabs").onclick=$("#tabs2").onclick=e=>{const t=e.target.dataset.t;if(t){view.tab=t;view.edit=false;render()}};
 }
 function getDraft(k){
-  if(!store.drafts[k]){const d={};PLAN[k].ex.forEach(([id,,n])=>d[id]=Array.from({length:n},()=>({kg:"",r:""})));d._note="";store.drafts[k]=d}
-  return store.drafts[k];
+  const d=store.drafts[k]||(store.drafts[k]={_note:""});
+  const ids=PLAN[k].ex.map(e=>e[0]);
+  PLAN[k].ex.forEach(([id,,n])=>{const a=d[id]||(d[id]=[]);while(a.length<n)a.push({kg:"",r:""});if(a.length>n)a.length=n});
+  Object.keys(d).forEach(id=>{if(id!=="_note"&&!ids.includes(id))delete d[id]});
+  return d;
+}
+function renderEdit(k){
+  const p=PLAN[k];
+  $("#sub").textContent="Modifica "+p.n;
+  $("#main").innerHTML=`<div class="ex"><h3>Nome della giornata</h3><input class="txt" data-focus="1" value="${esc(p.f)}"></div>`+
+  p.ex.map(([id,name,n,rr,rec],i)=>`<div class="ex">
+    <input class="txt" data-i="${i}" data-f="1" value="${esc(name)}" placeholder="Nome esercizio">
+    <div class="edrow"><label>Serie<input inputmode="numeric" data-i="${i}" data-f="2" value="${n}"></label>
+    <label>Rip / sec<input data-i="${i}" data-f="3" value="${esc(rr)}"></label>
+    <label>Recupero<input data-i="${i}" data-f="4" value="${esc(rec)}"></label></div>
+    <div class="edbtn"><button data-mv="${i}" data-d="-1" ${i?"":"disabled"}>↑</button><button data-mv="${i}" data-d="1" ${i<p.ex.length-1?"":"disabled"}>↓</button><button class="del" data-rm="${i}">Elimina</button></div>
+  </div>`).join("")+
+  `<button class="add" id="addex">+ Aggiungi esercizio</button>`;
+  $("#main").oninput=e=>{const t=e.target;
+    if(t.dataset.focus){p.f=t.value}
+    else if(t.dataset.f){const f=+t.dataset.f;let v=t.value;if(f===2){v=Math.max(1,Math.min(10,parseInt(v)||1))}p.ex[+t.dataset.i][f]=v}
+    save()};
+  $("#main").onclick=e=>{const t=e.target;
+    if(t.dataset.mv!==undefined){const i=+t.dataset.mv,j=i+(+t.dataset.d);[p.ex[i],p.ex[j]]=[p.ex[j],p.ex[i]];save();renderEdit(k)}
+    else if(t.dataset.rm!==undefined){if(confirm("Eliminare "+(p.ex[+t.dataset.rm][1]||"questo esercizio")+"? Lo storico resta.")){p.ex.splice(+t.dataset.rm,1);save();renderEdit(k)}}
+    else if(t.id==="addex"){p.ex.push(["x"+Date.now().toString(36),"",3,"8–12","90\""]);save();renderEdit(k);
+      const ins=document.querySelectorAll('input[data-f="1"]');ins[ins.length-1].focus()}};
+  $("#bar").innerHTML=`<button class="s" id="rst">Ripristina originale</button><button class="p" id="fine">Fatto</button>`;
+  $("#fine").onclick=()=>{p.ex=p.ex.filter(e=>String(e[1]).trim());PLAN[k]=p;save();view.edit=false;render()};
+  $("#rst").onclick=()=>{if(confirm("Ripristinare la scheda originale di "+p.n+"?")){PLAN[k]=clone(DEFAULT_PLAN[k]);save();render()}};
 }
 function renderDay(k){
+  if(view.edit)return renderEdit(k);
   const p=PLAN[k],d=getDraft(k);
   $("#sub").textContent=p.f;
-  $("#main").innerHTML=`<p class="focus">Kg = zavorra o carico (corpo libero: lascia vuoto). Rip = ripetizioni o secondi.</p>`+
+  $("#main").innerHTML=`<button class="add" id="edit">✎ Modifica esercizi di ${p.n}</button><p class="focus">Kg = zavorra o carico (corpo libero: lascia vuoto). Rip = ripetizioni o secondi.</p>`+
   p.ex.map(([id,name,n,rr,rec])=>{
     const l=lastFor(id);
     return `<div class="ex"><h3>${esc(name)}</h3><div class="meta"><span>${n} × ${esc(rr)}</span><span>rec. ${esc(rec)}</span></div>
@@ -143,6 +184,7 @@ function renderDay(k){
       <input inputmode="numeric" data-id="${id}" data-i="${i}" data-f="r" value="${esc(s.r)}" placeholder="${l&&l.sets[i]?esc(l.sets[i].r):""}" class="${s.r!==""?"done":""}">`).join("")}
     </div></div>`}).join("")+
   `<div class="ex"><h3>Note</h3><input class="note" data-note="1" value="${esc(d._note)}" placeholder="Sensazioni, dolori, sonno…"></div>`;
+  $("#main").onclick=e=>{if(e.target.id==="edit"){view.edit=true;render()}};
   $("#main").oninput=e=>{
     const t=e.target;
     if(t.dataset.note){d._note=t.value}else if(t.dataset.id){
@@ -177,7 +219,7 @@ function renderHistory(){
   };
   $("#imp").onclick=()=>{const f=document.createElement("input");f.type="file";f.accept=".json,application/json";
     f.onchange=()=>{const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.sessions)throw 0;
-      if(confirm(`Sostituire i dati con il backup (${d.sessions.length} allenamenti)?`)){store.sessions=d.sessions;store.drafts=d.drafts||{};save();render();toast("Backup importato")}}catch(e){toast("File non valido")}};r.readAsText(f.files[0])};f.click()};
+      if(confirm(`Sostituire i dati con il backup (${d.sessions.length} allenamenti)?`)){store.sessions=d.sessions;store.drafts=d.drafts||{};if(d.plan)dayKeys.forEach(k=>{if(d.plan[k])PLAN[k]=d.plan[k]});save();render();toast("Backup importato")}}catch(e){toast("File non valido")}};r.readAsText(f.files[0])};f.click()};
 }
 function series(id){
   return store.sessions.map(s=>{const v=(s.entries[id]||[]).filter(t=>t.r!==""&&!isNaN(+t.r));if(!v.length)return null;
